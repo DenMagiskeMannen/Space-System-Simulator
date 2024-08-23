@@ -26,7 +26,7 @@ running = True
 class Celestial():
     Bodies = []
     
-    def __init__(self, Point=None, Mass=None, Size=None, Velocity=None):
+    def __init__(self, Point=None, Mass=None, Size=None, Velocity=None, Colour=None):
         if Point is not None:
             self.point = Point
         else:
@@ -34,7 +34,8 @@ class Celestial():
         
         self.size = Size if Size is not None else 6371000  # Default radius in meters
         self.mass = Mass if Mass is not None else 5.972 * (10 ** 24)  # Default mass in kg
-        self.velocity = Velocity if Velocity is not None else [random.randint(-20, 20), random.randint(-20, 20)]
+        self.velocity = Velocity if Velocity is not None else [random.randint(-5, 5), random.randint(-5, 5)]
+        self.colour= Colour if Colour is not None else [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
         
         self.PixelRadius = MeterToPixel(self.size, zoom)
         self.Information = []
@@ -80,6 +81,10 @@ class Celestial():
             self.point[0]+=self.velocity[0] *dt
             self.point[1]+=self.velocity[1]*dt
             self.PixelRadius = MeterToPixel(self.size, zoom)
+        if self.point[0] < 0 or self.point[0] > screenie[0]:
+            self.velocity[0]=self.velocity[0]*(-0.95)
+        if self.point[1] < 0 or self.point[1] > screenie[1]:
+            self.velocity[1]=self.velocity[1]*(-0.95)
             
     def SELF_DESTRUCT(self):
         self.Bodies.remove(self)
@@ -87,13 +92,13 @@ class Celestial():
 
 # Initial zoom level
 zoom = 1.0
-
-bob = Celestial()
-carl = Celestial()
-#SUN = Celestial(Point=[screenie[0] // 2, screenie[1] // 2], Size=6371000 * 3, Mass=5.972 * (10 ** 27), Velocity=[0, 0])
-
-for i in range(100):
+#Celestial(Velocity=[0, 0],Mass=5.972 * (10 ** 27),Size=6371000)
+for i in range(50):
     Celestial(Velocity=[0, 0])
+#SUN = Celestial(Point=[screenie[0] // 2, screenie[1] // 2], Size=63710000 * 3, Mass=5.972 * (10 ** 27), Velocity=[0, 0])
+
+#for i in range(100):
+    #Celestial(Velocity=[0, 0])
 dt = 0
 while running:
     for event in pygame.event.get():
@@ -104,14 +109,16 @@ while running:
                 zoom = zoom*1.1
             elif event.button == 5:  # Button 5 (usually forward button on some mice)
                 zoom = zoom/1.1
-
+    
+    while len(Celestial.Bodies)<30:
+        Celestial(Velocity=[0, 0])
     for bod in Celestial.Bodies:
         bod.Force()
         bod.Act(dt)
     print(len(Celestial.Bodies))
     screen.fill("white")
     for bod in Celestial.Bodies:
-        pygame.draw.circle(screen, "purple", (int(bod.point[0]), int(bod.point[1])), int(bod.PixelRadius))
+        pygame.draw.circle(screen, "black", (int(bod.point[0]), int(bod.point[1])), int(bod.PixelRadius))
    
     pygame.display.flip()
     dt = clock.tick(60) / 1000
