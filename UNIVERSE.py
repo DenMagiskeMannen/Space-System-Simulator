@@ -81,9 +81,19 @@ class Celestial():
             self.point[0]+=self.velocity[0] *dt
             self.point[1]+=self.velocity[1]*dt
             self.PixelRadius = MeterToPixel(self.size, zoom)
-        if self.point[0] < 0 or self.point[0] > screenie[0]:
+            
+        if self.point[0] < 0:
+            self.point[0]+=5
             self.velocity[0]=self.velocity[0]*(-0.95)
-        if self.point[1] < 0 or self.point[1] > screenie[1]:
+        elif self.point[0] > screenie[0]:
+            self.point[0]-=5
+            self.velocity[0]=self.velocity[0]*(-0.95)
+            
+        if self.point[1] < 0:
+            self.point[1]+=5
+            self.velocity[1]=self.velocity[1]*(-0.95)
+        elif self.point[1] > screenie[1]:
+            self.point[1]-=5
             self.velocity[1]=self.velocity[1]*(-0.95)
             
     def SELF_DESTRUCT(self):
