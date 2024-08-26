@@ -84,18 +84,34 @@ class Celestial():
             
         if self.point[0] < 0:
             self.point[0]+=5
-            self.velocity[0]=self.velocity[0]*(-0.95)
+            self.velocity[0]=self.velocity[0]*(-0.8)
         elif self.point[0] > screenie[0]:
             self.point[0]-=5
-            self.velocity[0]=self.velocity[0]*(-0.95)
+            self.velocity[0]=self.velocity[0]*(-0.8)
             
         if self.point[1] < 0:
             self.point[1]+=5
-            self.velocity[1]=self.velocity[1]*(-0.95)
+            self.velocity[1]=self.velocity[1]*(-0.8)
         elif self.point[1] > screenie[1]:
             self.point[1]-=5
-            self.velocity[1]=self.velocity[1]*(-0.95)
+            self.velocity[1]=self.velocity[1]*(-0.8)
             
+    
+    def CheckSize(self):
+        self.PixelRadius = MeterToPixel(self.size, zoom)
+        #print(self.PixelRadius)
+        if self.PixelRadius >= screenie[0]/2:
+            self.size=6371000
+            if self.colour[0] >= 3:
+                self.colour[0] -= 3
+            if self.colour[1] >= 3:
+                self.colour[1] -= 3
+            if self.colour[2] >= 3:
+                self.colour[2] -= 3
+            
+            print(self.colour)
+            #self.SELF_DESTRUCT()
+    
     def SELF_DESTRUCT(self):
         self.Bodies.remove(self)
         
@@ -119,16 +135,24 @@ while running:
                 zoom = zoom*1.1
             elif event.button == 5:  # Button 5 (usually forward button on some mice)
                 zoom = zoom/1.1
+            elif event.button == 1: 
+                #print(event.pos)
+                holder=[0,0]
+                holder[0]=event.pos[0]
+                holder[1]=event.pos[1]
+                print(holder)
+                Celestial(Velocity=[0, 0],Point=holder)
     
     while len(Celestial.Bodies)<30:
         Celestial(Velocity=[0, 0])
     for bod in Celestial.Bodies:
         bod.Force()
         bod.Act(dt)
-    print(len(Celestial.Bodies))
+        bod.CheckSize()
+    #print(len(Celestial.Bodies))
     screen.fill("white")
     for bod in Celestial.Bodies:
-        pygame.draw.circle(screen, "black", (int(bod.point[0]), int(bod.point[1])), int(bod.PixelRadius))
+        pygame.draw.circle(screen, bod.colour, (int(bod.point[0]), int(bod.point[1])), int(bod.PixelRadius))
    
     pygame.display.flip()
     dt = clock.tick(60) / 1000
