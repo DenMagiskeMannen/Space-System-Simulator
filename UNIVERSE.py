@@ -2,11 +2,13 @@
 Created on Sun Aug 11 19:42:05 2024
 
 @author: teodo
+Sounds by ibby
 """
 import pygame
 import time
 import random
 import math
+import numpy as np
 
 def MeterToPixel(Meters, zoom):
     DirectPixels = Meters / (1274200 / zoom)
@@ -17,7 +19,29 @@ def PixelToMeter(Pixels, zoom):
     Meters = Pixels * (1274200 / zoom)
     return Meters
 
+#Change pitch function made by Chat_gpt
+# Function to change the pitch
+def change_pitch(sound, pitch_factor):
+    sound_array = pygame.sndarray.array(sound)
+    # Resample the array
+    indices = np.round(np.arange(0, len(sound_array), pitch_factor))
+    indices = indices[indices < len(sound_array)].astype(int)
+    pitched_sound_array = sound_array[indices]
+    # Convert the numpy array back to a Sound object
+    pitched_sound = pygame.sndarray.make_sound(pitched_sound_array)
+    return pitched_sound
+
+
 pygame.init()
+pygame.mixer.init()
+
+# Load the sound file
+POP1 = pygame.mixer.Sound('POP1.mp3')
+POP2 = pygame.mixer.Sound('POP2.mp3')
+POP3 = pygame.mixer.Sound('POP3.mp3')
+Shabom= pygame.mixer.Sound('shabom.mp3')
+soundeffects=[POP1,POP2,POP3]
+
 screenie = (1280, 720)
 screen = pygame.display.set_mode(screenie)
 clock = pygame.time.Clock()
@@ -100,7 +124,9 @@ class Celestial():
     def CheckSize(self):
         self.PixelRadius = MeterToPixel(self.size, zoom)
         #print(self.PixelRadius)
+        
         if self.PixelRadius >= screenie[0]/2:
+            Shabom.play()
             self.size=6371000
             if self.colour[0] >= 3:
                 self.colour[0] -= 3
@@ -113,6 +139,11 @@ class Celestial():
             #self.SELF_DESTRUCT()
     
     def SELF_DESTRUCT(self):
+        sound=random.choices(soundeffects)
+        PitchEffect=random.randint(90,110)/100
+        sound=change_pitch(sound[0],PitchEffect)
+        #sound[0].play()
+        sound.play()
         self.Bodies.remove(self)
         
 
@@ -120,7 +151,7 @@ class Celestial():
 zoom = 1.0
 #Celestial(Velocity=[0, 0],Mass=5.972 * (10 ** 27),Size=6371000)
 for i in range(50):
-    Celestial(Velocity=[0, 0])
+    Celestial(Velocity=[0, 0],Colour=[0,0,0])
 #SUN = Celestial(Point=[screenie[0] // 2, screenie[1] // 2], Size=63710000 * 3, Mass=5.972 * (10 ** 27), Velocity=[0, 0])
 
 #for i in range(100):
@@ -144,7 +175,7 @@ while running:
                 Celestial(Velocity=[0, 0],Point=holder)
     
     while len(Celestial.Bodies)<30:
-        Celestial(Velocity=[0, 0])
+        Celestial(Velocity=[0, 0],Colour=[0,0,0])
     for bod in Celestial.Bodies:
         bod.Force()
         bod.Act(dt)
