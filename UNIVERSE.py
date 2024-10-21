@@ -136,7 +136,25 @@ class Celestial():
                 self.colour[2] -= 3
             
             print(self.colour)
-            #self.SELF_DESTRUCT()
+            self.ShootCircles(5,10)
+            self.SELF_DESTRUCT()
+    def ShootCircles(self,amount,speed):
+        distance=20
+        angles=(360/amount)
+        #print(amount)
+        currentDeg=0
+        for i in range(amount):
+            rad=math.radians(currentDeg)
+            DY=math.sin(rad)*distance
+            DX=math.cos(rad)*distance
+            circle=[self.point[0]+DX,self.point[1]+DY]
+            Vx=speed*math.cos(rad)
+            Vy=speed*math.sin(rad)
+            Speed=[Vx,Vy]
+            #print(speed)
+            Celestial(Point=[self.point[0]+DX,self.point[1]+DY],Velocity=Speed,Size=self.size,Mass=self.mass/amount)
+            currentDeg+=angles
+            #currentDeg=angles*(i+1)
     
     def SELF_DESTRUCT(self):
         sound=random.choices(soundeffects)
@@ -154,6 +172,7 @@ for i in range(50):
     Celestial(Velocity=[0, 0],Colour=[0,0,0])
 #SUN = Celestial(Point=[screenie[0] // 2, screenie[1] // 2], Size=63710000 * 3, Mass=5.972 * (10 ** 27), Velocity=[0, 0])
 
+circles=[]
 #for i in range(100):
     #Celestial(Velocity=[0, 0])
 dt = 0
@@ -173,6 +192,7 @@ while running:
                 holder[1]=event.pos[1]
                 print(holder)
                 Celestial(Velocity=[0, 0],Point=holder)
+                
     
     while len(Celestial.Bodies)<30:
         Celestial(Velocity=[0, 0],Colour=[0,0,0])
@@ -181,6 +201,8 @@ while running:
         bod.Act(dt)
         bod.CheckSize()
     #print(len(Celestial.Bodies))
+    
+    
     screen.fill("white")
     for bod in Celestial.Bodies:
         pygame.draw.circle(screen, bod.colour, (int(bod.point[0]), int(bod.point[1])), int(bod.PixelRadius))
